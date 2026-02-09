@@ -1,18 +1,18 @@
 import {
   LayoutDashboard, Calendar, Ticket, Users, DollarSign, CheckSquare,
-  ClipboardList, Shield, Megaphone, GraduationCap, LogOut
+  ClipboardList, Shield, Megaphone, GraduationCap
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useRole } from '@/contexts/RoleContext';
-import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/data/mockData';
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
   SidebarHeader, SidebarFooter,
 } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 
 const adminLinks = [
   { title: 'Dashboard', url: '/', icon: LayoutDashboard },
@@ -50,15 +50,8 @@ const roleIcons: Record<UserRole, typeof Shield> = {
   student: GraduationCap,
 };
 
-const roleLabels: Record<UserRole, string> = {
-  admin: 'Admin',
-  organizer: 'Organizer',
-  student: 'Student',
-};
-
 export function AppSidebar() {
-  const { role } = useRole();
-  const { user, signOut } = useAuth();
+  const { role, setRole } = useRole();
   const links = linksByRole[role];
   const RoleIcon = roleIcons[role];
 
@@ -101,18 +94,23 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="p-4 border-t border-sidebar-border space-y-3">
-        <div className="flex items-center gap-2">
-          <RoleIcon className="h-4 w-4 text-sidebar-foreground/60" />
-          <Badge variant="outline" className="text-xs">
-            {roleLabels[role]}
-          </Badge>
-        </div>
-        <p className="text-xs text-sidebar-foreground/50 truncate">{user?.email}</p>
-        <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-sidebar-foreground/70" onClick={signOut}>
-          <LogOut className="h-4 w-4" />
-          Sign Out
-        </Button>
+      <SidebarFooter className="p-4 border-t border-sidebar-border">
+        <label className="text-[10px] uppercase tracking-widest text-sidebar-foreground/40 mb-1.5 block">
+          Switch Role
+        </label>
+        <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
+          <SelectTrigger className="bg-sidebar-accent border-sidebar-border text-sidebar-foreground text-sm">
+            <div className="flex items-center gap-2">
+              <RoleIcon className="h-3.5 w-3.5" />
+              <SelectValue />
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="organizer">Organizer</SelectItem>
+            <SelectItem value="student">Student</SelectItem>
+          </SelectContent>
+        </Select>
       </SidebarFooter>
     </Sidebar>
   );
